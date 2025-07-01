@@ -297,8 +297,9 @@ Scope {
                     id: barRightSideMouseArea
 
                     anchors.right: parent.right
-                    implicitHeight: barHeight
-                    width: (barRoot.width - (barLeftSideMouseArea.width + middleSection.width + weatherLoader.width))
+                    implicitHeight: Appearance.sizes.baseBarHeight
+                    height: Appearance.sizes.barHeight
+                    width: barRoot.width - (barLeftSideMouseArea.width + middleSection.width + weatherLoader.width)
 
                     property bool hovered: false
                     property real lastScrollX: 0
