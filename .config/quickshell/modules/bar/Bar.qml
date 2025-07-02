@@ -66,11 +66,45 @@ Scope {
                 anchors {
                     right: parent.right
                     left: parent.left
-                    top: !ConfigOptions.bar.bottom ? parent.top : undefined
-                    bottom: ConfigOptions.bar.bottom ? parent.bottom : undefined
+                    top: parent.top
+                    bottom: undefined
                 }
-                color: showBarBackground ? Appearance.colors.colLayer0 : "transparent"
-                height: barHeight
+                implicitHeight: Appearance.sizes.barHeight
+                height: Appearance.sizes.barHeight
+
+                states: State {
+                    name: "bottom"
+                    when: Config.options.bar.bottom
+                    AnchorChanges {
+                        target: barContent
+                        anchors {
+                            right: parent.right
+                            left: parent.left
+                            top: undefined
+                            bottom: parent.bottom
+                        }
+                    }
+                }
+
+                // Background shadow
+                Loader {
+                    active: showBarBackground && Config.options.bar.cornerStyle === 1
+                    anchors.fill: barBackground
+                    sourceComponent: StyledRectangularShadow {
+                        anchors.fill: undefined // The loader's anchors act on this, and this should not have any anchor
+                        target: barBackground
+                    }
+                }
+                // Background
+                Rectangle {
+                    id: barBackground
+                    anchors {
+                        fill: parent
+                        margins: Config.options.bar.cornerStyle === 1 ? (Appearance.sizes.hyprlandGapsOut) : 0 // idk why but +1 is needed
+                    }
+                    color: showBarBackground ? Appearance.colors.colLayer0 : "transparent"
+                    radius: Config.options.bar.cornerStyle === 1 ? Appearance.rounding.windowRounding : 0
+                }
 
                 MouseArea { // Left side | scroll to change brightness
                     id: barLeftSideMouseArea
@@ -169,7 +203,7 @@ Scope {
                                     anchors.centerIn: parent
                                     width: 19.5
                                     height: 19.5
-                                    source: ConfigOptions.bar.topLeftIcon == 'distro' ? SystemInfo.distroIcon : "spark-symbolic"
+                                    source: Config.options.bar.topLeftIcon == 'distro' ? SystemInfo.distroIcon : "spark-symbolic"
                                 }
 
                                 ColorOverlay {
@@ -212,7 +246,7 @@ Scope {
                     }
 
                     VerticalBarSeparator {
-                        visible: ConfigOptions?.bar.borderless
+                        visible: Config.options?.bar.borderless
                     }
 
                     BarGroup {
@@ -239,7 +273,7 @@ Scope {
                     }
 
                     VerticalBarSeparator {
-                        visible: ConfigOptions?.bar.borderless
+                        visible: Config.options?.bar.borderless
                     }
 
                     MouseArea {
@@ -276,20 +310,7 @@ Scope {
                     }
 
                     VerticalBarSeparator {
-                        visible: Config.options.bar.borderless
-                    }
-                }
-
-                // Weather
-                Loader {
-                    id: weatherLoader
-                    active: Config.options.bar.weather.enable
-                    anchors.left: middleSection.right
-                    anchors.margins: 10
-                    sourceComponent: BarGroup {
-                        implicitHeight: Appearance.sizes.baseBarHeight
-                        height: Appearance.sizes.barHeight
-                        WeatherBar {}
+                        visible: Config.options.bar.borderless && Config.options.bar.weather.enable
                     }
                 }
 
@@ -299,7 +320,7 @@ Scope {
                     anchors.right: parent.right
                     implicitHeight: Appearance.sizes.baseBarHeight
                     height: Appearance.sizes.barHeight
-                    width: barRoot.width - (barLeftSideMouseArea.width + middleSection.width + weatherLoader.width)
+                    width: (barRoot.width - middleSection.width) / 2
 
                     property bool hovered: false
                     property real lastScrollX: 0
@@ -459,6 +480,15 @@ Scope {
                             Item {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
+
+                                // Weather
+                                Loader {
+                                    active: Config.options.bar.weather.enable
+                                    sourceComponent: BarGroup {
+                                        implicitHeight: Appearance.sizes.baseBarHeight
+                                        WeatherBar {}
+                                    }
+                                }
                             }
                         }
                     }
