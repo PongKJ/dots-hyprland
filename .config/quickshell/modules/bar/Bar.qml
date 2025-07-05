@@ -484,6 +484,8 @@ Scope {
 
                             // Weather
                             Loader {
+                                Layout.leftMargin: 8
+                                Layout.fillHeight: true
                                 active: Config.options.bar.weather.enable
                                 sourceComponent: BarGroup {
                                     implicitHeight: Appearance.sizes.baseBarHeight
